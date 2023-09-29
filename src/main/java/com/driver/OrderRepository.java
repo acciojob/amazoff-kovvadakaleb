@@ -23,7 +23,6 @@ public class OrderRepository {
     }
     public void addOrder(Order order) {
         orderList.put(order.getId(), order);
-        System.out.println(order.getDeliveryTime());
     }
 
     public void addPartner(String partnerId) {
@@ -125,13 +124,13 @@ public class OrderRepository {
     }
 
     public Integer getOrdersLeftAfterGivenTimeByPartnerId(String time, String partnerId) {
-        System.out.println("Partner Time"+time);
+
         String hours =time.charAt(0)+""+time.charAt(1);
-        System.out.println(hours);
+
         String minutes = time.charAt(3)+""+time.charAt(4);
-        System.out.println(minutes);
+
         int partnerTime = (Integer.parseInt(hours))*60+(Integer.parseInt(minutes));
-        System.out.println(partnerTime);
+
 
         Integer count = 0;
         if(partnerOrders.containsKey(partnerId)){
@@ -194,10 +193,11 @@ public class OrderRepository {
             for(String order : orders){
                 DeliveryPartner partner = partnerList.get(partnerId);
                 int no_of_orders = partner.getNumberOfOrders();
-                no_of_orders -= 1;
+                partner.setNumberOfOrders(no_of_orders=no_of_orders-1);
             }
             partnerOrders.remove(partnerId);
         }
+        if(partnerList.containsKey(partnerId)) partnerList.remove(partnerId);
     }
 
     public void deleteOrderById(String orderId) {
@@ -207,7 +207,7 @@ public class OrderRepository {
                 if (orderKey.equals(orderId)) {
                      DeliveryPartner partner  =  partnerList.get(key);
                      int no_of_Orders = partner.getNumberOfOrders();
-                     no_of_Orders -= 1;
+                     partner.setNumberOfOrders(no_of_Orders=no_of_Orders-1);
                       orders.remove(orderKey);
                 }
             }
