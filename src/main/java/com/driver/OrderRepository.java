@@ -23,6 +23,7 @@ public class OrderRepository {
     }
     public void addOrder(Order order) {
         orderList.put(order.getId(), order);
+        System.out.println(order.getDeliveryTime());
     }
 
     public void addPartner(String partnerId) {
@@ -124,11 +125,17 @@ public class OrderRepository {
     }
 
     public Integer getOrdersLeftAfterGivenTimeByPartnerId(String time, String partnerId) {
-        String hours = time.charAt(0)+time.charAt(1)+"";
-        String minutes = time.charAt(3)+time.charAt(4)+"";
-        int partnerTime = Integer.parseInt(hours)*60+Integer.parseInt(minutes);
+        System.out.println("Partner Time"+time);
+        String hours =time.charAt(0)+""+time.charAt(1);
+        System.out.println(hours);
+        String minutes = time.charAt(3)+""+time.charAt(4);
+        System.out.println(minutes);
+        int partnerTime = (Integer.parseInt(hours))*60+(Integer.parseInt(minutes));
+        System.out.println(partnerTime);
+
         Integer count = 0;
         if(partnerOrders.containsKey(partnerId)){
+
            List<String> orders = partnerOrders.get(partnerId);
            for(String order : orders){
                for(String orderKey : orderList.keySet()){
@@ -136,7 +143,7 @@ public class OrderRepository {
                        Order myorder = orderList.get(orderKey);
                        int deliveryTime = myorder.getDeliveryTime();
                        if(partnerTime>deliveryTime){
-                           count++;
+                           count=count+1;
                        }
                        break;
                    }
@@ -148,7 +155,7 @@ public class OrderRepository {
     }
 
     public String getLastDeliveryTimeByPartnerId(String partnerId) {
-
+        String time ="";
         int lastDeliveryTime = Integer.MIN_VALUE;
         if(partnerOrders.containsKey(partnerId)){
         List<String> orders  = partnerOrders.get(partnerId);
@@ -164,35 +171,48 @@ public class OrderRepository {
                 }
             }
         }
-
+            int hours = lastDeliveryTime/60;
+            int minutes = lastDeliveryTime%60;
+            String hourFormat = ""+hours;
+            String minutesFormat = ""+minutes;
+            if(hours<10){
+                hourFormat = "0"+hours;
+            }
+            if(minutes<10){
+                minutesFormat = "0"+minutes;
+            }
+             time = hourFormat+":"+minutesFormat;
         }
 
-        int hours = lastDeliveryTime/60;
-        int minutes = lastDeliveryTime%60;
-        String hourFormat = ""+hours;
-        String minutesFormat = ""+minutes;
-        if(hours<10){
-            hourFormat = "0"+hours;
-        }
-        if(minutes<10){
-            minutesFormat = "0"+minutes;
-        }
-        String time = hourFormat+":"+minutesFormat;
+
         return time;
     }
 
     public void deletePartnerById(String partnerId) {
-        partnerOrders.remove(partnerId);
+        if(partnerOrders.containsKey(partnerId)){
+            List<String> orders = partnerOrders.get(partnerId);
+            for(String order : orders){
+                DeliveryPartner partner = partnerList.get(partnerId);
+                int no_of_orders = partner.getNumberOfOrders();
+                no_of_orders -= 1;
+            }
+            partnerOrders.remove(partnerId);
+        }
     }
 
     public void deleteOrderById(String orderId) {
-        for(List<String> orders : partnerOrders.values()){
+        for(String key : partnerOrders.keySet()){
+            List<String> orders = partnerOrders.get(key);
             for(String orderKey : orders){
-                if(orderKey.equals(orderId)){
-                    orders.remove(orderKey);
+                if (orderKey.equals(orderId)) {
+                     DeliveryPartner partner  =  partnerList.get(key);
+                     int no_of_Orders = partner.getNumberOfOrders();
+                     no_of_Orders -= 1;
+                      orders.remove(orderKey);
                 }
             }
         }
         orderList.remove(orderId);
+
     }
 }
